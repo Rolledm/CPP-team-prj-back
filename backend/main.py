@@ -3,6 +3,7 @@ from flask import request
 import json
 import entities
 from pymongo import MongoClient
+import subprocess
 
 app = Flask(__name__)
 
@@ -49,6 +50,23 @@ def userAdd():
 @app.route('/debug')
 def debug():
     return "Test"
+
+@app.route('/run')
+def run():
+    task_id = 0 # TODO get task_id from query
+    required_output = db['tasks'].find_one({'id': task_id})['answer']
+
+    cmd = ["g++", "-o", "./temp_example/main", "./temp_example/main.cc"]
+    proc = subprocess.Popen(cmd)
+    proc.wait()
+    output = subprocess.check_output(["./temp_example/main"]).decode("utf-8")
+    if output == required_output:
+        task_id += 1
+        # TODO push updated task_id to user data
+        return "ok"
+    else:
+        return "error"
+    
 
 print("Starting server...")
 
