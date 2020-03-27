@@ -67,6 +67,14 @@ def run():
     else:
         return "error"
     
+@app.route('/progress')
+def progress():
+    user_res = db['users'].find_one({"login": request.args.get('login')})
+    try:
+        retVal = user_res['taskId']
+        return retVal
+    except:
+        pass
 
 print("Starting server...")
 
