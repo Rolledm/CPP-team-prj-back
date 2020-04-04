@@ -74,7 +74,7 @@ def run():
         db['users'].save(user)
         return '{"result": "OK"}'
     else:
-        pass
+        return '{"result": "NOT OK}'
     
 @app.route('/progress')
 def progress():
