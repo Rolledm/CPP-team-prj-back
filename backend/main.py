@@ -4,8 +4,10 @@ import json
 import entities
 from pymongo import MongoClient
 import subprocess
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 @app.after_request
 def after_request(response):
@@ -21,7 +23,7 @@ def userAPI():
     user_res = db['users'].find_one({"login": request.args.get('login')}) 
 
     try:
-        user = entities.User(user_res['id'], user_res['login'], user_res['password'], user_res['eMail'], user_res['Name'])
+        user = entities.User(user_res['id'], user_res['login'], user_res['password'], user_res['eMail'], user_res['name'])
         if user.password == request.args.get('password'):
             return json.dumps(user.__dict__)
     except:
@@ -38,9 +40,9 @@ def userAdd():
     login = data['login']
     password = data['password']
     eMail = data['eMail']
-    Name = data['Name']
+    name = data['name']
 
-    user = entities.User(max_id + 1, login, password, eMail)
+    user = entities.User(max_id + 1, login, password, eMail, name)
 
     db['users'].insert_one(user.__dict__)
 
@@ -49,7 +51,7 @@ def userAdd():
 
 @app.route('/debug')
 def debug():
-    return "Test"
+    return '{"Test": "test"}'
 
 @app.route('/run')
 def run():
@@ -75,6 +77,12 @@ def progress():
         return retVal
     except:
         pass
+
+@app.route('/temp', methods=["POST"])
+def ss():
+    file = request.files['file']
+    file.save("./temp_example/main.cpp")
+    return "ok"
 
 print("Starting server...")
 

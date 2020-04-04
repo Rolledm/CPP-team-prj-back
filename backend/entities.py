@@ -3,14 +3,16 @@ class User:
     login: str
     password: str
     eMail: str
+    name: str
     taskId: int
     
-    def __init__(self, id, login, password, eMail):
+    def __init__(self, id, login, password, eMail, name):
         super().__init__()
         self.id = id
         self.login = login
         self.password = password
         self.eMail = eMail
+        self.name = name
         self.taskId = 0
       
 
