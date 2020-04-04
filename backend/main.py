@@ -53,21 +53,28 @@ def userAdd():
 def debug():
     return '{"Test": "test"}'
 
-@app.route('/run')
+@app.route('/run', methods=["POST"])
 def run():
-    task_id = 0 # TODO get task_id from query
+    file = request.files['file']
+    file.save("./temp_example/main.cpp")
+    #data = request.get_json() TODO
+
+    task_id = 0
+    #user = db['users'].find_one({'login': data['login']})
+    user = db['users'].find_one({'login': 'rld'})
+
     required_output = db['tasks'].find_one({'id': task_id})['answer']
 
-    cmd = ["g++", "-o", "./temp_example/main", "./temp_example/main.cc"]
+    cmd = ["g++", "-o", "./temp_example/main", "./temp_example/main.cpp"]
     proc = subprocess.Popen(cmd)
     proc.wait()
     output = subprocess.check_output(["./temp_example/main"]).decode("utf-8")
     if output == required_output:
-        task_id += 1
-        # TODO push updated task_id to user data
-        return "ok"
+        user['taskId'] = str(int(user['taskId']) + 1)
+        db['users'].save(user)
+        return '{"result": "OK"}'
     else:
-        return "error"
+        pass
     
 @app.route('/progress')
 def progress():
@@ -77,12 +84,6 @@ def progress():
         return retVal
     except:
         pass
-
-@app.route('/temp', methods=["POST"])
-def ss():
-    file = request.files['file']
-    file.save("./temp_example/main.cpp")
-    return "ok"
 
 print("Starting server...")
 
